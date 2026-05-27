@@ -9,12 +9,20 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AboutRouteImport } from './routes/about'
+import { Route as ReposRouteImport } from './routes/repos'
+import { Route as UsernameRouteImport } from './routes/$username'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as UsernameIndexRouteImport } from './routes/$username.index'
+import { Route as UsernameEventsRouteImport } from './routes/$username.events'
 
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
+const ReposRoute = ReposRouteImport.update({
+  id: '/repos',
+  path: '/repos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UsernameRoute = UsernameRouteImport.update({
+  id: '/$username',
+  path: '/$username',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -22,40 +30,72 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UsernameIndexRoute = UsernameIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => UsernameRoute,
+} as any)
+const UsernameEventsRoute = UsernameEventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => UsernameRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '/$username': typeof UsernameRouteWithChildren
+  '/repos': typeof ReposRoute
+  '/$username/events': typeof UsernameEventsRoute
+  '/$username/': typeof UsernameIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '/repos': typeof ReposRoute
+  '/$username/events': typeof UsernameEventsRoute
+  '/$username': typeof UsernameIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '/$username': typeof UsernameRouteWithChildren
+  '/repos': typeof ReposRoute
+  '/$username/events': typeof UsernameEventsRoute
+  '/$username/': typeof UsernameIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about'
+  fullPaths: '/' | '/$username' | '/repos' | '/$username/events' | '/$username/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about'
-  id: '__root__' | '/' | '/about'
+  to: '/' | '/repos' | '/$username/events' | '/$username'
+  id:
+    | '__root__'
+    | '/'
+    | '/$username'
+    | '/repos'
+    | '/$username/events'
+    | '/$username/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AboutRoute: typeof AboutRoute
+  UsernameRoute: typeof UsernameRouteWithChildren
+  ReposRoute: typeof ReposRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
+    '/repos': {
+      id: '/repos'
+      path: '/repos'
+      fullPath: '/repos'
+      preLoaderRoute: typeof ReposRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$username': {
+      id: '/$username'
+      path: '/$username'
+      fullPath: '/$username'
+      preLoaderRoute: typeof UsernameRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -65,12 +105,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$username/': {
+      id: '/$username/'
+      path: '/'
+      fullPath: '/$username/'
+      preLoaderRoute: typeof UsernameIndexRouteImport
+      parentRoute: typeof UsernameRoute
+    }
+    '/$username/events': {
+      id: '/$username/events'
+      path: '/events'
+      fullPath: '/$username/events'
+      preLoaderRoute: typeof UsernameEventsRouteImport
+      parentRoute: typeof UsernameRoute
+    }
   }
 }
 
+interface UsernameRouteChildren {
+  UsernameEventsRoute: typeof UsernameEventsRoute
+  UsernameIndexRoute: typeof UsernameIndexRoute
+}
+
+const UsernameRouteChildren: UsernameRouteChildren = {
+  UsernameEventsRoute: UsernameEventsRoute,
+  UsernameIndexRoute: UsernameIndexRoute,
+}
+
+const UsernameRouteWithChildren = UsernameRoute._addFileChildren(
+  UsernameRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AboutRoute: AboutRoute,
+  UsernameRoute: UsernameRouteWithChildren,
+  ReposRoute: ReposRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

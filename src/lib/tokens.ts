@@ -1,0 +1,15 @@
+export const C = {
+  bg: 'oklch(0.155 0.008 240)',
+  surface: 'oklch(0.198 0.009 240)',
+  surface2: 'oklch(0.235 0.011 240)',
+  border: 'oklch(0.305 0.014 240)',
+  borderSoft: 'oklch(0.255 0.012 240)',
+  borderStrong: 'oklch(0.42 0.018 240)',
+  fg: 'oklch(0.96 0.005 240)',
+  fgMuted: 'oklch(0.72 0.012 240)',
+  fgDim: 'oklch(0.52 0.014 240)',
+  fgFaint: 'oklch(0.38 0.014 240)',
+  accent: 'oklch(0.86 0.13 195)',
+  accentGlow: 'oklch(0.86 0.13 195 / 0.18)',
+  accentWash: 'oklch(0.86 0.13 195 / 0.08)',
+} as const
